@@ -132,6 +132,9 @@ pm2 start app.js -i max
 #sudo env PATH=$PATH:/home/$USER/local/bin /home/$USER/local/lib/node_modules/pm2/bin/pm2 startup app.js -u $USER --hp /home/$USER
 
 
+#TODO Throughput will use wrk
 
 
-
+#TODO Log Parser
+#Command working, need to add in crontab
+awk '{print $9,$7}' access.log | sort | uniq -c | sort -rn
