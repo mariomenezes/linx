@@ -59,18 +59,26 @@ sudo apt install nginx -y
 #Make a copy of /etc/nginx/nginx.conf
 sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 
-#sudo sed -i 's/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\
-#server {\
-#    listen 80;\
-#    server_name test.linx.intra;\
-#    location \/ {\
-#        proxy_pass http:\/\/127.0.0.1:8000;\
-#    }\
-#    location \/static {\
-#        root \/home\/'$USER'\/app\/;\
-#    }\
-#}/1' /etc/nginx/nginx.conf
+#TODO check the correct config file
+#Option 1
+sudo sed -i 's/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\
+server {\
+    listen 80;\
+    #server_name test.linx.intra;\
+    location \/ {\
+                        proxy_pass http:\/\/127.0.0.1:3000;\
+                        proxy_http_version 1.1;\
+                        proxy_set_header Upgrade $http_upgrade;\
+                        proxy_set_header Connection 'upgrade';\
+                        proxy_set_header Host $host;\
+                        proxy_cache_bypass $http_upgrade;\
+                }\
+    location \/static {\
+        root \/home\/'$USER'\/app\/;\
+    }\
+}/1' /etc/nginx/nginx.conf
 
+#Option 2
 echo "server {
                 listen 80;
                 server_name test.linx.intra;
