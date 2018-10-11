@@ -125,6 +125,8 @@ sudo systemctl enable nginx
 #Copy express module to the correct place, so we can run pm2 correctly
 cp -r /home/$USER/local/lib/node_modules/express/ /home/$USER/app/node_modules/
 
+#Create ecoystem file with PM2 to provide deploy and rollback func
+pm2 ecosystem
 
 npm install -g pm2
 pm2 start app.js -i max
@@ -137,4 +139,9 @@ pm2 start app.js -i max
 
 #TODO Log Parser
 #Command working, need to add in crontab
-awk '{print $9,$7}' access.log | sort | uniq -c | sort -rn
+awk '{print $9,$7}' /var/log/nginx/access.log | sort | uniq -c | sort -rn
+
+#tarefa infowester 
+
+(crontab -l ; echo "@daily /home/$USER/linx/envia_relatorio | crontab
+
