@@ -19,11 +19,11 @@ module.exports = {
 
   deploy : {
     production : {
-      user : 'username',
-      host : 'INSERT_IP',
+      user : 'mario',
+      host : 'localhost',
       ref  : 'origin/master',
-      repo : 'git@github.com:USERNAME/REPOSITORY.git',
-      path : 'PATH_TO_APP',
+      repo : 'git@github.com:mariomenezes/linx.git',
+      path : '/home/mario/app/',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production'
     }
   }
