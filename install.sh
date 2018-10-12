@@ -134,6 +134,11 @@ pm2 start app.js -i max
 #sudo env PATH=$PATH:/home/$USER/local/bin /home/$USER/local/lib/node_modules/pm2/bin/pm2 startup app.js -u $USER --hp /home/$USER
 
 
+
+#Deploy test
+pm2 deploy ecosystem.config.js production setup
+
+
 #TODO Throughput will use wrk
 
 

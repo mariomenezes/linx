@@ -9,7 +9,7 @@ cd ~/linx
 
 #do some changes in file
 sed -i 's/username/'$USER'/1' ecosystem.config.js
-sed -i 's/INSERT_IP/127.0.0.1/1' ecosystem.config.js
+sed -i 's/INSERT_IP/localhost/1' ecosystem.config.js
 sed -i 's/USERNAME/mariomenezes/1' ecosystem.config.js
 sed -i 's/REPOSITORY/linx/1' ecosystem.config.js
 sed -i 's/PATH_TO_APP/\/home\/'$USER'\/app\//1' ecosystem.config.js
@@ -19,7 +19,9 @@ cp ecosystem.config.js /home/$USER/app/
 cd /home/$USER/app/
 
 # Setup deployment at remote location
-pm2 deploy production setup
+#pm2 deploy production setup
+print "RSA_KEY_PASSWORD: 	123456"
+pm2 deploy ecosystem.config.js production setup
 
 # Update remote version
 pm2 deploy production update
