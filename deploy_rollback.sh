@@ -31,4 +31,21 @@ pm2 deploy production revert 1
 pm2 deploy production exec "pm2 reload all"
 
 
+#copy ssh credentials. NOTE that is not the best way or the most security
+#but is the only way we can do in this test
+#best way is using ssh-copy-id and append ssh private keys.
+mkdir -p /home/$USER/.ssh/
+cp /home/$USER/linx/ssh_key/id_rsa /home/$USER/.ssh/
+#cp /home/$USER/linx/ssh_key/id_dsa /home/$USER/.ssh/
+
+#Start the ssh-agent in the background.
+eval "$(ssh-agent -s)"
+ssh-add /home/$USER/.ssh/id_rsa
+
+#Install ssh and dependecies
+sudo apt install ssh -y
+#Code to deploy app based on ecosystem.config.js file
+pm2 deploy ecosystem.config.js production setup
+
+
 
