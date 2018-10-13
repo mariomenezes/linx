@@ -14,12 +14,12 @@ tar -xzvf node-latest.tar.gz --strip-components 1
 make install
 
 #Init NPM and create package.json#TODO verify wht it does
-print "Apenas confirme todas as escolhas"
-npm init
+echo "Apenas confirme todas as escolhas"
+/home/$USER/local/bin/npm init
 #### Install NPM and Express
-npm install -g express
+/home/$USER/local/bin/npm install -g express
 #Installing the module globally will let you run commands from the command line, but you'll have to link the package into your local sphere to require it from within a program:
-npm link express
+/home/$USER/local/bin/npm link express
 
 #Building and run app.js
 mkdir -p ~/app
@@ -29,7 +29,7 @@ cp $LINX_BASEDIR/app.js /home/$USER/app/
 
 #Install nginx to use reverse proxy
 sudo apt update
-print "Install nginx web serve and siege for load test"
+echo "Install nginx web serve and siege for load test"
 sleep 3
 sudo apt install nginx siege -y
 
@@ -64,7 +64,7 @@ sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 sudo cp $LINX_BASEDIR/self-signed.conf /etc/nginx/snippets/self-signed.conf
 
 #Test and Restart nginx
-print "Verify the status of the file"
+echo "Verify the status of the file"
 sleep 3
 sudo nginx -t 
 sudo service nginx restart
@@ -114,28 +114,28 @@ cp $LINX_BASEDIR/ssh_key/id_rsa /home/$USER/.ssh/
 eval "$(ssh-agent -s)"
 chmod 0400 /home/$USER/.ssh/id_rsa
 
-print "INSERT RSA_KEY_PASSWORD WHEN PROMPTED: 123456"
+echo "INSERT RSA_KEY_PASSWORD WHEN PROMPTED: 123456"
 sleep 3
 
 ssh-add /home/$USER/.ssh/id_rsa
 
-print "PM2 - Deploy using github version - possible to do a rolback"
-print "Deploy code"
-print " 	pm2 deploy ecosystem.config.js production"
-print "Update remote version"
-print "		pm2 deploy production update"
-print "Revert to -1 deployment"
-print "		pm2 deploy production revert 1"
+echo "PM2 - Deploy using github version - possible to do a rolback"
+echo "Deploy code"
+echo " 	pm2 deploy ecosystem.config.js production"
+echo "Update remote version"
+echo "		pm2 deploy production update"
+echo "Revert to -1 deployment"
+echo "		pm2 deploy production revert 1"
 
-print "Setup deployment at remote location"
+echo "Setup deployment at remote location"
 pm2 deploy ecosystem.config.js production setup
 
-print "Start node process, one process per core dynamically"
+echo "Start node process, one process per core dynamically"
 pm2 start app.js -i max
 pm2 list
 
-print "To ADD app.js in startup"
-print "sudo env PATH=$PATH:/home/$USER/local/bin /home/$USER/local/lib/node_modules/pm2/bin/pm2 startup app.js -u $USER --hp /home/$USER"
+echo "To ADD app.js in startup"
+echo "sudo env PATH=$PATH:/home/$USER/local/bin /home/$USER/local/lib/node_modules/pm2/bin/pm2 startup app.js -u $USER --hp /home/$USER"
 
 #tarefa
 mkdir -p /home/$USER/cron_job
@@ -143,7 +143,7 @@ cp $LINX_BASEDIR/envia_relatorio.sh /home/$USER/cron_job/
 crontab -l ; echo -e "MAILTO="mario@linx.intra"\n@daily /home/$USER/cron_job/envia_relatorio.sh" | crontab
 
 #Throughput test using siege -  a command line load test tool
-print "starting test with 100 concurrent request - duration 10s"
+echo "starting test with 100 concurrent request - duration 10s"
 sleep 5
 concurrent=100
 FAILURE=0
@@ -176,7 +176,7 @@ while [ $FAILURE -eq 0 ]; do
      sleep 5;
 done
 
-print "Print last lines from /var/log/siege.log"
+echo "Print last lines from /var/log/siege.log"
 head -n1 /var/log/siege.log
 tail -n10 /var/log/siege.log
 
