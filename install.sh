@@ -29,13 +29,14 @@ cp LINX_BASEDIR/app.js /home/$USER/app/
 
 #Install nginx to use reverse proxy
 sudo apt update
-sudo apt install nginx -y
+print "Install nginx web serve and siege for load test"
+sleep 3
+sudo apt install nginx siege -y
 
 #Make a copy of /etc/nginx/nginx.conf
 sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 
-#TODO check the correct config file
-#Option 1
+#Change nginx.conf file
 sudo sed -i 's/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\
 server {\
     listen 80;\
@@ -61,6 +62,7 @@ sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
 
 #Test and Restart nginx
 print "Verify the status of the file"
+sleep 3
 sudo nginx -t 
 sudo service nginx restart
 sudo systemctl enable nginx
@@ -109,7 +111,9 @@ cp LINX_BASEDIR/ssh_key/id_rsa /home/$USER/.ssh/
 eval "$(ssh-agent -s)"
 chmod 0400 /home/$USER/.ssh/id_rsa
 
-print "INSERT RSA_KEY_PASSWORD: 123456"
+print "INSERT RSA_KEY_PASSWORD WHEN PROMPTED: 123456"
+sleep 3
+
 ssh-add /home/$USER/.ssh/id_rsa
 
 print "PM2 - Deploy using github version - possible to do a rolback"
@@ -135,7 +139,15 @@ mkdir -p /home/$USER/cron_job
 cp LINX_BASEDIR/envia_relatorio.sh /home/$USER/cron_job/
 crontab -l ; echo -e "MAILTO="mario@linx.intra"\n@daily /home/$USER/cron_job/envia_relatorio.sh" | crontab
 
-#TODO Throughput will use wrk
+#Throughput test using siege -  a command line load test tool
+print "starting test with 100 concurrent request - duration 10s"
+
+#Filter result from siege
+#Thoughtput
+THOUGHPUT='cat siege.log | awk '{print $8}' | tail -1 | sed 's/.$//''
+
+#How many failures
+FAILURE='cat siege.log | awk '{print $11}' | tail -1'
 
 #TODO Log Parser
 #Command working, already added in crontab - file envia_relatorio.sh"
