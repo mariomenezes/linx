@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LINX_BASEDIR = $PWD
+LINX_BASEDIR=$PWD
 
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 . ~/.bashrc
@@ -25,7 +25,7 @@ npm link express
 mkdir -p ~/app
 
 #cp /home/$USER/linx/app.js /home/$USER/app/
-cp LINX_BASEDIR/app.js /home/$USER/app/
+cp $LINX_BASEDIR/app.js /home/$USER/app/
 
 #Install nginx to use reverse proxy
 sudo apt update
@@ -53,15 +53,15 @@ server {\
         root \/home\/'$USER'\/app\/;\
     }\
 }/1' /etc/nginx/nginx.conf
-
+echo -e "\n\n\nBASEDIR: $LINX_BASEDIR\n\n\n"
 #Preparing NGINX server and app.conf
 #sudo cp /home/$USER/linx/app.conf /etc/nginx/sites-available/
-sudo cp LINX_BASEDIR/app.conf /etc/nginx/sites-available/
+sudo cp $LINX_BASEDIR/app.conf /etc/nginx/sites-available/
 sudo sed -i 's/USER/'$USER'/' /etc/nginx/sites-available/app.conf
 sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
-sudo cp LINX_BASEDIR/ssl/nginx-selfsigned.crt
+sudo cp $LINX_BASEDIR/ssl/nginx-selfsigned.crt
 sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
-sudo cp LINX_BASEDIR/self-signed.conf /etc/nginx/snippets/self-signed.conf
+sudo cp $LINX_BASEDIR/self-signed.conf /etc/nginx/snippets/self-signed.conf
 
 #Test and Restart nginx
 print "Verify the status of the file"
@@ -90,7 +90,7 @@ cd ~/app
 cp ecosystem.config.js ecosystem.config.js.bak
 
 #cd ~/linx
-cd LINX_BASEDIR
+cd $LINX_BASEDIR
 
 #do some changes in file
 sed -i 's/username/'$USER'/1' ecosystem.config.js
@@ -108,7 +108,7 @@ cd /home/$USER/app/
 #best way is using ssh-copy-id and append ssh private keys.
 mkdir -p /home/$USER/.ssh/
 #cp /home/$USER/linx/ssh_key/id_rsa /home/$USER/.ssh/
-cp LINX_BASEDIR/ssh_key/id_rsa /home/$USER/.ssh/
+cp $LINX_BASEDIR/ssh_key/id_rsa /home/$USER/.ssh/
 
 #Start the ssh-agent in the background.
 eval "$(ssh-agent -s)"
@@ -139,7 +139,7 @@ print "sudo env PATH=$PATH:/home/$USER/local/bin /home/$USER/local/lib/node_modu
 
 #tarefa
 mkdir -p /home/$USER/cron_job
-cp LINX_BASEDIR/envia_relatorio.sh /home/$USER/cron_job/
+cp $LINX_BASEDIR/envia_relatorio.sh /home/$USER/cron_job/
 crontab -l ; echo -e "MAILTO="mario@linx.intra"\n@daily /home/$USER/cron_job/envia_relatorio.sh" | crontab
 
 #Throughput test using siege -  a command line load test tool
@@ -154,7 +154,7 @@ while [ $FAILURE -eq 0 ]; do
      echo "Server tested with $TIME_ seconds";
      sleep 1;
      echo "starting....";
-     sudo siege -f LINX_BASEDIR/hosts_siege.list -c $concurrent -t $TIME_\s
+     sudo siege -f $LINX_BASEDIR/hosts_siege.list -c $concurrent -t $TIME_\s
      TRHOUGHPUT=`cat /var/log/siege.log | awk '{print $8}' | tail -1 | sed 's/,$//'`;
      FAILURE=`cat /var/log/siege.log | awk '{print $11}' | tail -1`;
      let concurrent=concurrent+50;
@@ -188,6 +188,3 @@ echo -e "BEST Throughput = $BEST\n\n\n";
 #TODO Log Parser
 #Command working, already added in crontab - file envia_relatorio.sh"
 awk '{print $9,$7}' /var/log/nginx/access.log | sort | uniq -c | sort -rn
-
-
-
