@@ -53,15 +53,19 @@ server {\
         root \/home\/'$USER'\/app\/;\
     }\
 }/1' /etc/nginx/nginx.conf
+
+sudo rm /etc/nginx/sites-enabled/default.conf
 echo -e "\n\n\nBASEDIR: $LINX_BASEDIR\n\n\n"
 #Preparing NGINX server and app.conf
 #sudo cp /home/$USER/linx/app.conf /etc/nginx/sites-available/
 sudo cp $LINX_BASEDIR/app.conf /etc/nginx/sites-available/
 sudo sed -i 's/USER/'$USER'/' /etc/nginx/sites-available/app.conf
 sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
-sudo cp $LINX_BASEDIR/ssl/nginx-selfsigned.crt
+sudo cp $LINX_BASEDIR/ssl/nginx-selfsigned.crt /etc/ssl/certs/
+sudo cp $LINX_BASEDIR/ssl/nginx-selfsigned.key /etc/ssl/private/
 sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
-sudo cp $LINX_BASEDIR/self-signed.conf /etc/nginx/snippets/self-signed.conf
+sudo cp $LINX_BASEDIR/ssl/ssl-params.conf /etc/nginx/snippets/
+sudo cp $LINX_BASEDIR/ssl/self-signed.conf /etc/nginx/snippets/
 
 #Test and Restart nginx
 echo "Verify the status of the file"
@@ -80,12 +84,13 @@ npm install -g pm2
 cp -r /home/$USER/local/lib/node_modules/express/ /home/$USER/app/node_modules/
 
 #Create ecoystem file with PM2 to provide deploy and rollback func
+cd /home/$USER/app/
 pm2 ecosystem
 
 #Generate a sample ecosystem.json file that lists the processes and the deployment environment.
 #pm2 ecosystem
 
-cd ~/app
+#cd ~/app
 #Backup orignal file
 cp ecosystem.config.js ecosystem.config.js.bak
 
