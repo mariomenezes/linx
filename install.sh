@@ -59,6 +59,9 @@ server {\
 sudo cp LINX_BASEDIR/app.conf /etc/nginx/sites-available/
 sudo sed -i 's/USER/'$USER'/' /etc/nginx/sites-available/app.conf
 sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
+sudo cp LINX_BASEDIR/ssl/nginx-selfsigned.crt
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+sudo cp LINX_BASEDIR/self-signed.conf /etc/nginx/snippets/self-signed.conf
 
 #Test and Restart nginx
 print "Verify the status of the file"
@@ -151,7 +154,7 @@ while [ $FAILURE -eq 0 ]; do
      echo "Server tested with $TIME_ seconds";
      sleep 1;
      echo "starting....";
-     sudo siege  -c $concurrent -t $TIME_\s http://localhost
+     sudo siege -f LINX_BASEDIR/hosts_siege.list -c $concurrent -t $TIME_\s
      TRHOUGHPUT=`cat /var/log/siege.log | awk '{print $8}' | tail -1 | sed 's/,$//'`;
      FAILURE=`cat /var/log/siege.log | awk '{print $11}' | tail -1`;
      let concurrent=concurrent+50;
