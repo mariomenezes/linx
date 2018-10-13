@@ -141,13 +141,46 @@ crontab -l ; echo -e "MAILTO="mario@linx.intra"\n@daily /home/$USER/cron_job/env
 
 #Throughput test using siege -  a command line load test tool
 print "starting test with 100 concurrent request - duration 10s"
+sleep 5
+concurrent=100
+FAILURE=0
+TIME_=5
+BEST=0.00
+while [ $FAILURE -eq 0 ]; do
+     echo "Server tested with $concurrent connections";
+     echo "Server tested with $TIME_ seconds";
+     sleep 1;
+     echo "starting....";
+     sudo siege  -c $concurrent -t $TIME_\s http://localhost
+     TRHOUGHPUT=`cat /var/log/siege.log | awk '{print $8}' | tail -1 | sed 's/,$//'`;
+     FAILURE=`cat /var/log/siege.log | awk '{print $11}' | tail -1`;
+     let concurrent=concurrent+50;
+     let TIME_=TIME_+0
+     echo "Failure(s) = $FAILURE";
+     echo "Time(s) = $TIME_";
+     echo "Throughput = $TRHOUGHPUT";
+     #if (( $(echo "$TRHOUGHPUT > $BEST" |bc -l) ));
+    # if [ $TRHOUGHPUT -gt $BEST ]
+      #   then
+#               let BEST=TRHOUGHPUT;
+ #    fi
+     if [ ${TRHOUGHPUT%.*} -eq ${BEST%.*} ] && [ ${TRHOUGHPUT#*.} \> ${BEST#*.} ] || [ ${TRHOUGHPUT%.*} -gt ${BEST%.*} ]; then
+        echo "${THROUGHPUT} > ${BEST}";
+        BEST=$TRHOUGHPUT;
+     else
+        echo "${THROUGHPUT} <= ${BEST}";
+     fi
+     sleep 5;
+done
 
-#Filter result from siege
-#Thoughtput
-THOUGHPUT='cat siege.log | awk '{print $8}' | tail -1 | sed 's/.$//''
+print "Print last lines from /var/log/siege.log"
+head -n1 /var/log/siege.log
+tail -n10 /var/log/siege.log
 
-#How many failures
-FAILURE='cat siege.log | awk '{print $11}' | tail -1'
+echo -e "\n\n\nStart to fail with $concurrent concurrent connections"
+echo -e "number of failures = $FAILURE";
+echo -e "BEST Throughput = $BEST\n\n\n";
+
 
 #TODO Log Parser
 #Command working, already added in crontab - file envia_relatorio.sh"
