@@ -10,14 +10,10 @@ Desafio Linx
 # apt install git -y
 $ git clone http://github.com/mariomenezes/linx.git
 ```
-### Instalando dependências e configurando ambiente referente a parte 2 do desafio:
+### Instalando dependências, configurando ambiente referente a parte 2 do desafio, executando processos node, executando teste de throughput, adicionando envio de relatórios via contrab e mostrando o relatório atual
 ```
 $ cd linx
 $ ./install.sh
-```
-### Executando processos node, executando teste de throughput, adicionando envio de relatórios via contrab e mostrando o relatório atual
-```
-$ ./run.sh
 ```
 ### Softwares utilizados:
 
