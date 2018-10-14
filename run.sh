@@ -1,5 +1,12 @@
 #!/bin/bash
-. ~/.bashrch
+
+chmod a+x ~/.bashrc
+PS1='$ '
+source ~/.bashrc
+
+MAX_CPU=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
+
+. ~/.bashrc
 _USER=$USER
 LINX_BASEDIR=$PWD
 
@@ -15,7 +22,7 @@ sleep 5
 
 cd $HOME/app/
 echo "Start node process, one process per core dynamically"
-pm2 start app.js -i max
+pm2 start app.js -i $MAX_CPU
 sleep 5
 pm2 list
 sleep 5
@@ -24,30 +31,37 @@ echo "sudo env PATH=$PATH:/home/$_USER/local/bin /home/$_USER/local/lib/node_mod
 
 sleep 3
 #tarefa
-mkdir -p /home/$_USER/cron_job
-cp $LINX_BASEDIR/envia_relatorio.sh /home/$_USER/cron_job/
-crontab -l ; echo -e "MAILTO="mario@linx.intra"\n@daily /home/$_USER/cron_job/envia_relatorio.sh" | crontab
+echo -e "\n\n\nAdded"
+echo -e "MAILTO="mario@linx.intra"\n@daily /home/$_USER/cron_job/relatorio.sh\n\n\n"
 
+mkdir -p /home/$_USER/cron_job
+cp $LINX_BASEDIR/relatorio.sh /home/$_USER/cron_job/
+crontab -l ; echo -e "MAILTO="mario@linx.intra"\n@daily /home/$_USER/cron_job/relatorio.sh" | crontab
+
+cd $LINX_BASEDIR
+
+echo -e "\n\n\nStating server load test\n\n\n"
+sleep 5
 #Throughput test using siege -  a command line load test tool
-echo "starting test with 100 concurrent request, 32 threads - duration 60s"
+echo "starting test with 100 concurrent request, $MAX_CPU threads - duration 60s"
 sleep 5
-./wrk -t32 -c100 -d60s https://localhost > saida_wrk
+./wrk -t$MAX_CPU -c100 -d60s https://localhost > saida_wrk
+cat saida
 out100=`cat saida | tail -n1 | awk '{print $2}'| sed 's/MB$//'`
-echo "starting test with 1000 concurrent request, 32 threads - duration 60s"
+echo "starting test with 1000 concurrent request, $MAX_CPU threads - duration 60s"
 sleep 5
-./wrk -t32 -c1000 -d60s https://localhost > saida_wrk
+./wrk -t$MAX_CPU -c1000 -d60s https://localhost > saida_wrk
+cat saida
 out1000=`cat saida | tail -n1 | awk '{print $2}'| sed 's/MB$//'`
-echo "starting test with 10000 concurrent request, 32 threads - duration 60s"
+echo "starting test with 10000 concurrent request, $MAX_CPU threads - duration 60s"
 sleep 5
-./wrk -t32 -c10000 -d60s https://localhost > saida_wrk
+./wrk -t$MAX_CPU -c10000 -d60s https://localhost > saida_wrk
+cat saida
 out10000=`cat saida | tail -n1 | awk '{print $2}'| sed 's/MB$//'`
 
-echo -e "\n\n\n\nMelhor Throughput: \n\n\n"
-echo -e "$out100\n $out1000\n $out10000" | sorte -n -r| head -n 1
+echo -e "\n\n\n\nBest Throughput: \n\n\n"
+echo -e "$out100\n $out1000\n $out10000" | sort -n -r| head -n 1
 echo -e "\n\n\n"
-
-
-
 
 
 #concurrent=100
@@ -90,8 +104,7 @@ echo -e "\n\n\n"
 #echo -e "BEST Throughput = $BEST\n\n\n";
 
 
-#TODO Log Parser
-#Command working, already added in crontab - file envia_relatorio.sh"
+echo -e "Log Parser:\n\n\n"
 awk '{print $9,$7}' /var/log/nginx/access.log | sort | uniq -c | sort -rn
 
 
